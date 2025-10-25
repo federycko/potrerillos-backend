@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: potrerillos_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-potrerillos_dev}
+      POSTGRES_USER: ${DATABASE_USERNAME:-dev_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-dev_password}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-dev_user} -d ${DATABASE_NAME:-potrerillos_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - potrerillos_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: potrerillos_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - potrerillos_network
+
+  strapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: potrerillos_strapi
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-1337}
+      
+      DATABASE_CLIENT: ${DATABASE_CLIENT:-postgres}
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME:-potrerillos_dev}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-dev_user}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-dev_password}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      
+      APP_KEYS: ${APP_KEYS:-toBeModified1,toBeModified2}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:-toBeModified}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-toBeModified}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-toBeModified}
+      JWT_SECRET: ${JWT_SECRET:-toBeModified}
+
+      ADMIN_ALLOWED_HOSTS: ${ADMIN_ALLOWED_HOSTS:-localhost}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:1337}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "${PORT:-1337}:${PORT:-1337}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - strapi_uploads:/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - potrerillos_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  strapi_uploads:
+
+networks:
+  potrerillos_network:
+    driver: bridge

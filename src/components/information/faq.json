@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_information_faqs",
+  "info": {
+    "displayName": "FAQ",
+    "icon": "question",
+    "description": "Question and answer for the FAQ section"
+  },
+  "options": {},
+  "attributes": {
+    "question": {
+      "type": "string",
+      "required": true,
+      "description": "The question"
+    },
+    "answer": {
+      "type": "text",
+      "required": true,
+      "description": "The answer"
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "kind": "collectionType",
+  "collectionName": "accommodations",
+  "info": {
+    "singularName": "accommodation",
+    "pluralName": "accommodations",
+    "displayName": "Accommodation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "hotel",
+        "cabana",
+        "camping",
+        "apart-hotel",
+        "hostel",
+        "glamping"
+      ]
+    },
+    "description": {
+      "type": "blocks",
+      "required": true
+    },
+    "capacity": {
+      "type": "integer"
+    },
+    "bedrooms": {
+      "type": "integer"
+    },
+    "bathrooms": {
+      "type": "integer"
+    },
+    "price_per_night": {
+      "type": "integer",
+      "min": 0
+    },
+    "price_weekend": {
+      "type": "integer",
+      "min": 0
+    },
+    "featured_image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "gallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "amenities": {
+      "type": "json"
+    },
+    "location": {
+      "type": "string"
+    },
+    "address": {
+      "type": "text"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "website": {
+      "type": "string"
+    },
+    "check_in": {
+      "type": "string"
+    },
+    "check_out": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer",
+      "min": 0,
+      "max": 5
+    },
+    "published": {
+      "type": "boolean",
+      "default": false
+    },
+    "microsite": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::microsite.microsite",
+      "inversedBy": "accommodations"
+    }
+  }
+}
